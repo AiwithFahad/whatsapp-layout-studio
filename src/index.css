@@ -138,3 +138,8 @@
     background: hsl(var(--muted-foreground) / 0.3);
   }
 }
+
+@keyframes progress {
+  from { width: 0%; }
+  to { width: 100%; }
+}

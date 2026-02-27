@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, CircleDot } from "lucide-react";
 import ChatListItem from "./ChatListItem";
 import type { Chat } from "@/data/chatData";
 
@@ -7,11 +7,12 @@ interface ChatListPanelProps {
   chats: Chat[];
   activeId: number | null;
   onSelect: (id: number) => void;
+  onStatusClick?: () => void;
 }
 
 type Tab = "all" | "unread" | "groups";
 
-const ChatListPanel = ({ chats, activeId, onSelect }: ChatListPanelProps) => {
+const ChatListPanel = ({ chats, activeId, onSelect, onStatusClick }: ChatListPanelProps) => {
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<Tab>("all");
 
@@ -35,9 +36,20 @@ const ChatListPanel = ({ chats, activeId, onSelect }: ChatListPanelProps) => {
     <div className="flex flex-col h-full bg-card">
       <div className="flex items-center justify-between px-5 py-4 gs-header-shadow">
         <h1 className="text-[22px] font-bold text-gs-text-primary tracking-tight">GhupShup</h1>
-        <span className="text-[10px] font-semibold tracking-wider uppercase text-gs-green bg-gs-green-light px-2.5 py-1 rounded-full">
-          Premium
-        </span>
+        <div className="flex items-center gap-3">
+          {onStatusClick && (
+            <button
+              onClick={onStatusClick}
+              className="text-gs-green hover:text-gs-green-dark transition-colors"
+              title="Status"
+            >
+              <CircleDot className="w-5 h-5" />
+            </button>
+          )}
+          <span className="text-[10px] font-semibold tracking-wider uppercase text-gs-green bg-gs-green-light px-2.5 py-1 rounded-full">
+            Premium
+          </span>
+        </div>
       </div>
 
       <div className="px-3 py-2">
