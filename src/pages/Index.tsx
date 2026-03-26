@@ -23,16 +23,19 @@ const Index = () => {
     );
   }, []);
 
-  const handleSend = useCallback((text: string) => {
+  const handleSend = useCallback((text: string, attachment?: Attachment) => {
     if (!activeChatId) return;
+    if (!text.trim() && !attachment) return;
     const now = new Date();
     const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
     const newMsg: Message = {
       id: Date.now(),
-      text,
+      text: text || "",
       time,
       sent: true,
+      attachment,
     };
+    const lastMsgText = attachment ? `📎 ${attachment.type === "voice" ? "Voice message" : attachment.name}` : text;
     setAllMessages((prev) => ({
       ...prev,
       [activeChatId]: [...(prev[activeChatId] || []), newMsg],
