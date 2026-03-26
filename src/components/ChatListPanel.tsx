@@ -144,9 +144,13 @@ const ChatListPanel = ({ chats, activeId, onSelect, onStatusClick }: ChatListPan
 
       {/* User footer */}
       <div className="flex items-center gap-3 px-4 py-3 border-t border-gs-divider bg-card">
-        <div className="w-9 h-9 rounded-full bg-gs-green flex items-center justify-center text-primary-foreground text-sm font-bold">
-          {user.name.charAt(0)}
-        </div>
+        {user.avatar ? (
+          <img src={user.avatar} alt={user.name} className="w-9 h-9 rounded-full object-cover" />
+        ) : (
+          <div className="w-9 h-9 rounded-full bg-gs-green flex items-center justify-center text-primary-foreground text-sm font-bold">
+            {user.name.charAt(0)}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <p className="text-[13px] font-semibold text-gs-text-primary truncate">{user.name}</p>
           <p className="text-[11px] text-gs-text-secondary truncate">{user.about}</p>
