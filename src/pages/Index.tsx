@@ -43,7 +43,7 @@ const Index = () => {
     // Update last message in chat list and move to top
     setChats((prev) => {
       const updated = prev.map((c) =>
-        c.id === activeChatId ? { ...c, lastMessage: text, time } : c
+        c.id === activeChatId ? { ...c, lastMessage: lastMsgText, time } : c
       );
       const active = updated.find((c) => c.id === activeChatId)!;
       return [active, ...updated.filter((c) => c.id !== activeChatId)];
