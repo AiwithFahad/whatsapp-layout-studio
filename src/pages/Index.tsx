@@ -3,7 +3,7 @@ import ChatListPanel from "@/components/ChatListPanel";
 import ChatWindow from "@/components/ChatWindow";
 import EmptyChatView from "@/components/EmptyChatView";
 import StatusView from "@/components/StatusView";
-import { initialChats, initialMessages, type Chat, type Message } from "@/data/chatData";
+import { initialChats, initialMessages, type Chat, type Message, type Attachment } from "@/data/chatData";
 
 const Index = () => {
   const [activeChatId, setActiveChatId] = useState<number | null>(1);
