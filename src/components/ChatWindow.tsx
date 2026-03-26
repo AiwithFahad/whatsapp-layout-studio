@@ -106,7 +106,7 @@ const ChatWindow = ({ chat, messages, onBack, onSend }: ChatWindowProps) => {
         el.onloadedmetadata = () => {
           att.duration = el.duration;
           setPendingAttachment(att);
-          setPendingPreviewUrl(type === "image" || type === "video" ? url : null);
+          setPendingPreviewUrl(url);
         };
       } else {
         setPendingAttachment(att);
