@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -201,13 +201,27 @@ const Profile = () => {
       <div className="flex-1 overflow-y-auto scrollbar-thin">
         {/* Profile header */}
         <div className="flex items-center gap-4 px-5 py-5">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-gs-green flex items-center justify-center gs-avatar-3d text-primary-foreground text-2xl font-bold">
-              {user.name.charAt(0)}
+          <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+            {user.avatar ? (
+              <img src={user.avatar} alt={user.name} className="w-20 h-20 rounded-full gs-avatar-3d object-cover" />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-gs-green flex items-center justify-center gs-avatar-3d text-primary-foreground text-2xl font-bold">
+                {user.name.charAt(0)}
+              </div>
+            )}
+            <div className="absolute inset-0 rounded-full bg-foreground/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <Camera className="w-6 h-6 text-primary-foreground" />
             </div>
-            <button className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-gs-green flex items-center justify-center border-2 border-card">
+            <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-gs-green flex items-center justify-center border-2 border-card">
               <Camera className="w-3.5 h-3.5 text-primary-foreground" />
-            </button>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarChange}
+            />
           </div>
           <div className="flex-1">
             {editingName ? (
