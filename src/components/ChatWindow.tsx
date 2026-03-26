@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, Phone, Video, MoreVertical, Smile, Paperclip, Mic, Send, ArrowLeft, Shield } from "lucide-react";
+import { Search, Phone, Video, MoreVertical, Smile, Paperclip, Mic, Send, ArrowLeft, Shield, X, ChevronUp, ChevronDown } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import EmojiPicker from "./EmojiPicker";
 import MediaAttachment from "./MediaAttachment";
@@ -19,11 +19,41 @@ const ChatWindow = ({ chat, messages, onBack, onSend }: ChatWindowProps) => {
   const [showMedia, setShowMedia] = useState(false);
   const [callType, setCallType] = useState<"voice" | "video" | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<number[]>([]);
+  const [searchIndex, setSearchIndex] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // In-chat search
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setSearchIndex(0);
+      return;
+    }
+    const q = searchQuery.toLowerCase();
+    const matches = messages
+      .filter((m) => m.text.toLowerCase().includes(q))
+      .map((m) => m.id);
+    setSearchResults(matches);
+    setSearchIndex(0);
+    if (matches.length > 0) {
+      messageRefs.current[matches[0]]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [searchQuery, messages]);
+
+  const navigateSearch = (dir: 1 | -1) => {
+    if (searchResults.length === 0) return;
+    const next = (searchIndex + dir + searchResults.length) % searchResults.length;
+    setSearchIndex(next);
+    messageRefs.current[searchResults[next]]?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
 
   const handleSend = () => {
     const trimmed = input.trim();
@@ -53,9 +83,11 @@ const ChatWindow = ({ chat, messages, onBack, onSend }: ChatWindowProps) => {
     return <CallScreen chat={chat} isVideo={callType === "video"} onEnd={() => setCallType(null)} />;
   }
 
+  const highlightedIds = new Set(searchResults);
+  const currentHighlight = searchResults[searchIndex];
+
   return (
     <div className="flex flex-col h-full bg-gs-chat">
-      {/* Notification toast */}
       {notification && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-gs-green text-primary-foreground text-sm font-semibold px-5 py-2.5 rounded-xl gs-card-shadow animate-fade-in">
           {notification}
@@ -92,10 +124,42 @@ const ChatWindow = ({ chat, messages, onBack, onSend }: ChatWindowProps) => {
             className="w-[20px] h-[20px] cursor-pointer hover:text-gs-text-primary transition-colors hidden sm:block"
             onClick={() => setCallType("voice")}
           />
-          <Search className="w-[20px] h-[20px] cursor-pointer hover:text-gs-text-primary transition-colors" />
+          <Search
+            className="w-[20px] h-[20px] cursor-pointer hover:text-gs-text-primary transition-colors"
+            onClick={() => setShowSearch(!showSearch)}
+          />
           <MoreVertical className="w-[20px] h-[20px] cursor-pointer hover:text-gs-text-primary transition-colors" />
         </div>
       </div>
+
+      {/* In-chat search bar */}
+      {showSearch && (
+        <div className="flex items-center gap-2 px-4 py-2 bg-card border-b border-gs-divider animate-fade-in">
+          <Search className="w-4 h-4 text-gs-text-secondary flex-shrink-0" />
+          <input
+            type="text"
+            placeholder="Search in conversation..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 bg-transparent text-sm text-gs-text-primary placeholder:text-gs-text-secondary outline-none"
+            autoFocus
+          />
+          {searchResults.length > 0 && (
+            <span className="text-[12px] text-gs-text-secondary font-medium flex-shrink-0">
+              {searchIndex + 1}/{searchResults.length}
+            </span>
+          )}
+          <button onClick={() => navigateSearch(-1)} className="text-gs-text-secondary hover:text-gs-text-primary">
+            <ChevronUp className="w-4 h-4" />
+          </button>
+          <button onClick={() => navigateSearch(1)} className="text-gs-text-secondary hover:text-gs-text-primary">
+            <ChevronDown className="w-4 h-4" />
+          </button>
+          <button onClick={() => { setShowSearch(false); setSearchQuery(""); }} className="text-gs-text-secondary hover:text-gs-text-primary">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto scrollbar-thin gs-chat-pattern px-4 py-4 sm:px-8 md:px-16 lg:px-20">
@@ -112,7 +176,19 @@ const ChatWindow = ({ chat, messages, onBack, onSend }: ChatWindowProps) => {
         </div>
 
         {messages.map((msg) => (
-          <MessageBubble key={msg.id} {...msg} />
+          <div
+            key={msg.id}
+            ref={(el) => { messageRefs.current[msg.id] = el; }}
+            className={`transition-all duration-300 ${
+              currentHighlight === msg.id
+                ? "ring-2 ring-gs-green rounded-xl"
+                : highlightedIds.has(msg.id)
+                ? "ring-1 ring-gs-green/30 rounded-xl"
+                : ""
+            }`}
+          >
+            <MessageBubble {...msg} />
+          </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
