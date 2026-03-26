@@ -16,6 +16,18 @@ const Profile = () => {
   const [editingAbout, setEditingAbout] = useState(false);
   const [nameValue, setNameValue] = useState(user.name);
   const [aboutValue, setAboutValue] = useState(user.about);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updateProfile({ avatar: reader.result as string });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
 
   const handleLogout = () => {
     logout();
