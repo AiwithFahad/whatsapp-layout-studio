@@ -3,7 +3,7 @@ import ChatListPanel from "@/components/ChatListPanel";
 import ChatWindow from "@/components/ChatWindow";
 import EmptyChatView from "@/components/EmptyChatView";
 import StatusView from "@/components/StatusView";
-import { initialChats, initialMessages, type Chat, type Message } from "@/data/chatData";
+import { initialChats, initialMessages, type Chat, type Message, type Attachment } from "@/data/chatData";
 
 const Index = () => {
   const [activeChatId, setActiveChatId] = useState<number | null>(1);
@@ -23,16 +23,19 @@ const Index = () => {
     );
   }, []);
 
-  const handleSend = useCallback((text: string) => {
+  const handleSend = useCallback((text: string, attachment?: Attachment) => {
     if (!activeChatId) return;
+    if (!text.trim() && !attachment) return;
     const now = new Date();
     const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
     const newMsg: Message = {
       id: Date.now(),
-      text,
+      text: text || "",
       time,
       sent: true,
+      attachment,
     };
+    const lastMsgText = attachment ? `📎 ${attachment.type === "voice" ? "Voice message" : attachment.name}` : text;
     setAllMessages((prev) => ({
       ...prev,
       [activeChatId]: [...(prev[activeChatId] || []), newMsg],
@@ -40,7 +43,7 @@ const Index = () => {
     // Update last message in chat list and move to top
     setChats((prev) => {
       const updated = prev.map((c) =>
-        c.id === activeChatId ? { ...c, lastMessage: text, time } : c
+        c.id === activeChatId ? { ...c, lastMessage: lastMsgText, time } : c
       );
       const active = updated.find((c) => c.id === activeChatId)!;
       return [active, ...updated.filter((c) => c.id !== activeChatId)];

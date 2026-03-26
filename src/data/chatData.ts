@@ -22,11 +22,22 @@ export interface Chat {
   isGroup?: boolean;
 }
 
+export type AttachmentType = "image" | "video" | "audio" | "document" | "voice";
+
+export interface Attachment {
+  type: AttachmentType;
+  url: string;       // data URL or object URL
+  name: string;
+  size?: number;      // bytes
+  duration?: number;  // seconds, for voice/audio
+}
+
 export interface Message {
   id: number;
   text: string;
   time: string;
   sent: boolean;
+  attachment?: Attachment;
 }
 
 export const initialChats: Chat[] = [
