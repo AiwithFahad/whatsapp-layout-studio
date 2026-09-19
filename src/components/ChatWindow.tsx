@@ -214,7 +214,7 @@ const ChatWindow = ({ chat, messages, onBack, onSend }: ChatWindowProps) => {
           <div>
             <h2 className="font-semibold text-gs-text-primary text-[15px] leading-tight">{chat.name}</h2>
             <p className="text-[12px] mt-0.5 font-medium text-gs-green">
-              {chat.online ? "online" : "last seen today at 9:45 AM"}
+              {chat.typing ? "typing..." : chat.online ? "online" : "last seen today at 9:45 AM"}
             </p>
           </div>
         </div>
@@ -307,7 +307,7 @@ const ChatWindow = ({ chat, messages, onBack, onSend }: ChatWindowProps) => {
           /* Normal input UI */
           <>
             <Smile className="w-6 h-6 text-gs-text-secondary cursor-pointer hover:text-gs-green transition-colors flex-shrink-0" onClick={() => { setShowEmoji(!showEmoji); setShowMedia(false); }} />
-            <Paperclip className="w-6 h-6 text-gs-text-secondary cursor-pointer hover:text-gs-green transition-colors flex-shrink-0 hidden sm:block" onClick={() => { setShowMedia(!showMedia); setShowEmoji(false); }} />
+            <Paperclip className="w-6 h-6 text-gs-text-secondary cursor-pointer hover:text-gs-green transition-colors flex-shrink-0" onClick={() => { setShowMedia(!showMedia); setShowEmoji(false); }} />
             <div className="flex-1 bg-gs-search rounded-2xl px-5 py-3 gs-input-shadow">
               <input
                 type="text"
